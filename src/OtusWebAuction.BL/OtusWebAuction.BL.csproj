@@ -12,8 +12,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Services\UserServices\" />
-    <Folder Include="Services\Новая папка\" />
+    <ProjectReference Include="..\OtusWebAuction.Domain\OtusWebAuction.Domain.csproj" />
   </ItemGroup>
 
 </Project>

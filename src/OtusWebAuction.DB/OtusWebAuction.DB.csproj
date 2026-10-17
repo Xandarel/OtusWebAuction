@@ -6,4 +6,9 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\OtusWebAuction.BL\OtusWebAuction.BL.csproj" />
+    <ProjectReference Include="..\OtusWebAuction.Domain\OtusWebAuction.Domain.csproj" />
+  </ItemGroup>
+
 </Project>
