@@ -1,9 +1,9 @@
 
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Authentication.OAuth;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi;
 using OtusWebAuction.Options;
+using OtusWebAuction.DB.DI;
 
 namespace OtusWebAuction
 {
@@ -48,6 +48,10 @@ namespace OtusWebAuction
                         ValidateIssuerSigningKey = true,
                     };
                 });
+            string connectionString = builder.Configuration.GetConnectionString("Postgres")
+                 ?? throw new InvalidOperationException("Connection string 'Postgres' is missing.");
+            builder.Services.AddDatabase(connectionString);
+
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.

@@ -6,13 +6,22 @@ namespace OtusWebAuction.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    public class UserController : ControllerBase
+    public class UserController(RegisterUserHandler registerUserHandler) : ControllerBase
     {
         [AllowAnonymous]
-        [HttpPost]
-        public async Task<ActionResult<RegisterUserResponce>> Register(RegisterUserRequest request)
+        [HttpPost("RegisterUser")]
+        public async Task<ActionResult<RegisterUserResponce>> Register(RegisterUserRequest request, CancellationToken ct)
         {
-            throw new NotImplementedException();
+            try
+            { 
+                RegisterUserResponce responce = await registerUserHandler.RegisterUser(request, ct);
+                
+                return Ok(responce);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
     }
 }
