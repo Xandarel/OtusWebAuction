@@ -2,8 +2,12 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi;
-using OtusWebAuction.Options;
+using OtusWebAuction.BL.Interfaces;
+using OtusWebAuction.BL.Users.Register;
 using OtusWebAuction.DB.DI;
+using OtusWebAuction.DB.Options;
+using OtusWebAuction.DB.Repositories;
+using OtusWebAuction.Options;
 
 namespace OtusWebAuction
 {
@@ -11,48 +15,57 @@ namespace OtusWebAuction
     {
         public static void Main(string[] args)
         {
-            var builder = WebApplication.CreateBuilder(args);
+            WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
             // Add services to the container.
-
-            builder.Services.AddControllers();
-            // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-            builder.Services.AddOpenApi();
-            builder.Services.AddSwaggerGen(options =>
+            builder.Host.ConfigureServices((context, services) =>
             {
-                options.SwaggerDoc("v1", new OpenApiInfo
+                services.AddControllers();
+                services.AddOpenApi();
+                services.AddEndpointsApiExplorer();
+                services.AddSwaggerGen(options =>
                 {
-                    Title = "Order Service API",
-                    Version = "v1",
-                    Description = "A REST API with Swagger for the Indotalent order service."
-                });
-            });
-            builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-                .AddJwtBearer(options =>
-                {
-                    options.TokenValidationParameters = new TokenValidationParameters
+                    options.SwaggerDoc("v1", new OpenApiInfo
                     {
-                        // указывает, будет ли валидироваться издатель при валидации токена
-                        ValidateIssuer = true,
-                        // строка, представляющая издателя
-                        ValidIssuer = AuthOptions.ISSUER,
-                        // будет ли валидироваться потребитель токена
-                        ValidateAudience = true,
-                        // установка потребителя токена
-                        ValidAudience = AuthOptions.AUDIENCE,
-                        // будет ли валидироваться время существования
-                        ValidateLifetime = true,
-                        // установка ключа безопасности
-                        IssuerSigningKey = AuthOptions.GetSymmetricSecurityKey(),
-                        // валидация ключа безопасности
-                        ValidateIssuerSigningKey = true,
-                    };
+                        Title = "Order Service API",
+                        Version = "v1",
+                        Description = "A REST API with Swagger for the Indotalent order service."
+                    });
                 });
-            string connectionString = builder.Configuration.GetConnectionString("Postgres")
-                 ?? throw new InvalidOperationException("Connection string 'Postgres' is missing.");
-            builder.Services.AddDatabase(connectionString);
 
-            var app = builder.Build();
+                services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                    .AddJwtBearer(options =>
+                    {
+                        options.TokenValidationParameters = new TokenValidationParameters
+                        {
+                            // указывает, будет ли валидироваться издатель при валидации токена
+                            ValidateIssuer = true,
+                            // строка, представляющая издателя
+                            ValidIssuer = AuthOptions.ISSUER,
+                            // будет ли валидироваться потребитель токена
+                            ValidateAudience = true,
+                            // установка потребителя токена
+                            ValidAudience = AuthOptions.AUDIENCE,
+                            // будет ли валидироваться время существования
+                            ValidateLifetime = true,
+                            // установка ключа безопасности
+                            IssuerSigningKey = AuthOptions.GetSymmetricSecurityKey(),
+                            // валидация ключа безопасности
+                            ValidateIssuerSigningKey = true,
+                        };
+                    });
+
+                services.AddTransient<IUserRepository, UserRepository>();
+                services.AddTransient<RegisterUserHandler>();
+                services.AddOptions<PostgresOptions>().BindConfiguration(PostgresOptions.SectionName);
+                PostgresOptions postgres = context.Configuration
+                    .GetSection(PostgresOptions.SectionName)
+                    .Get<PostgresOptions>()
+                    ?? throw new InvalidOperationException("Section 'Postgres' is missing.");
+                services.AddDatabase(postgres.BuildConnectionString());
+            });
+
+            WebApplication app = builder.Build();
 
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
@@ -64,7 +77,6 @@ namespace OtusWebAuction
 
             app.UseAuthentication();
             app.UseAuthorization();
-
 
             app.MapControllers();
             app.UseSwagger();
