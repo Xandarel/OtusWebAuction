@@ -1,5 +1,5 @@
-﻿using Microsoft.IdentityModel.Tokens;
-using System.Text;
+﻿using System.Text;
+using Microsoft.IdentityModel.Tokens;
 
 namespace OtusWebAuction.Options
 {
@@ -7,10 +7,10 @@ namespace OtusWebAuction.Options
     {
         public const string ISSUER = "WebAuthAuctionBackend"; // издатель токена
         public const string AUDIENCE = "WebAuthAuctionClient"; // потребитель токена
-        
+
         //TODO: Вынести в секрет
-        const string KEY = "mysupersecret_secretsecretsecretkey!123";   // ключ для шифрации
+        const string _key = "mysupersecret_secretsecretsecretkey!123";   // ключ для шифрации
         public static SymmetricSecurityKey GetSymmetricSecurityKey() =>
-            new SymmetricSecurityKey(Encoding.UTF8.GetBytes(KEY));
+            new(Encoding.UTF8.GetBytes(_key));
     }
 }

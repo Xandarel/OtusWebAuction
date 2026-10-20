@@ -2,29 +2,31 @@
 using OtusWebAuction.BL.Interfaces;
 using OtusWebAuction.BL.Users.Register;
 using OtusWebAuction.DB.Context;
-using System;
-using System.Collections.Generic;
-using System.Text;
+using OtusWebAuction.DB.Mapper;
 
 namespace OtusWebAuction.DB.Repositories
 {
     public sealed class UserRepository(AuctionDbContext dbContext) : IUserRepository
     {
-        public Task<RegisterUserResponce> CreateUser(RegisterUserRequest request, CancellationToken ct)
+
+        public async Task<RegisterUserResponce> CreateUser(RegisterUserRequest request, CancellationToken ct)
         {
-            throw new NotImplementedException();
+            var date = DateTime.UtcNow;
+            //TODO: хранить пароль как кеш
+            var user = UserMapper.ToUser(request);
+            user.CreatedDate = date;
+            user.LastUpdatedDate = date;
+
+            await dbContext.Users.AddAsync(user, ct);
+            await dbContext.SaveChangesAsync(ct);
+
+            return UserMapper.ToResponse(user);
         }
 
-        public Task GetByIdAsync(Guid id, CancellationToken ct) => throw new NotImplementedException();
+        public Task GetByIdAsync(Guid id, CancellationToken ct) =>
+            dbContext.Users.AsNoTracking().FirstOrDefaultAsync(x => x.Id == id, ct);
 
-        public Task<bool> IsUserExists(string email, CancellationToken ct)
-        {
-            return dbContext.Users.Select(x => x.Email).AnyAsync(x => x == email);
-        }
-
-        public Task<RegisterUserResponce> RegisterUser(RegisterUserResponce user, CancellationToken ct)
-        {
-            throw new NotImplementedException();
-        }
+        public Task<bool> IsUserExists(string email, CancellationToken ct) =>
+            dbContext.Users.AsNoTracking().Select(x => x.Email).AnyAsync(x => x == email, ct);
     }
 }
