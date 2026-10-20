@@ -30,4 +30,6 @@ namespace OtusWebAuction.Controllers
             // Implement login logic here
             // For example, validate user credentials and return JWT token if valid
             BadRequest("Login not implemented yet.");
+
     }
+}
