@@ -11,5 +11,8 @@ namespace OtusWebAuction.DB.Context
             : base(options)
         {
         }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder) =>
+            modelBuilder.ApplyConfigurationsFromAssembly(typeof(AuctionDbContext).Assembly);
     }
 }

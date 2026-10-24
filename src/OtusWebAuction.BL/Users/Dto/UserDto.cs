@@ -1,6 +1,6 @@
-﻿namespace OtusWebAuction.BL.Users.Register
+﻿namespace OtusWebAuction.BL.Users.Dto
 {
-    public sealed record RegisterUserResponce
+    public sealed record UserDto
     {
         public required string Name { get; set; }
         public required string Surname { get; set; }

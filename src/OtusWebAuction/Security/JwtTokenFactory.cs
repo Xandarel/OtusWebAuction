@@ -1,14 +1,14 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using Microsoft.IdentityModel.Tokens;
-using OtusWebAuction.BL.Users.Register;
+using OtusWebAuction.BL.Users.Dto;
 using OtusWebAuction.Options;
 
 namespace OtusWebAuction.Security
 {
     public sealed class JwtTokenFactory
     {
-        public string Create(RegisterUserResponce user)
+        public string Create(UserDto user)
         {
             SigningCredentials credentials = new SigningCredentials(
                 AuthOptions.GetSymmetricSecurityKey(),
