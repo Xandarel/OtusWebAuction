@@ -1,3 +1,6 @@
 <Solution>
+  <Project Path="src/OtusWebAuction.BL/OtusWebAuction.BL.csproj" Id="9b6524b6-666c-4a24-ad26-f1efe2051772" />
+  <Project Path="src/OtusWebAuction.DB/OtusWebAuction.DB.csproj" Id="c3a1234f-479f-401c-ba8f-e8ab2523c156" />
+  <Project Path="src/OtusWebAuction.Domain/OtusWebAuction.Domain.csproj" Id="9e9d8f3e-06d7-40a4-b57f-daa7a4ca1b99" />
   <Project Path="src/OtusWebAuction/OtusWebAuction.csproj" />
 </Solution>
