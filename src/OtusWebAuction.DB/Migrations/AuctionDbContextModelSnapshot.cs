@@ -25,7 +25,6 @@ namespace OtusWebAuction.DB.Migrations
             modelBuilder.Entity("OtusWebAuction.DB.Models.User", b =>
                 {
                     b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
                     b.Property<DateTime>("CreatedDate")
@@ -52,7 +51,10 @@ namespace OtusWebAuction.DB.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Users");
+                    b.HasIndex("Email")
+                        .IsUnique();
+
+                    b.ToTable("Users", (string)null);
                 });
 #pragma warning restore 612, 618
         }
