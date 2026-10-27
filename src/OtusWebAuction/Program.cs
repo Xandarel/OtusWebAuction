@@ -30,8 +30,25 @@ namespace OtusWebAuction
                     {
                         Title = "Order Service API",
                         Version = "v1",
-                        Description = "A REST API with Swagger for the Indotalent order service."
+                        Description = "A REST API with Swagger for the Indotalent order service.",
+
                     });
+
+                    options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+                    {
+                        Type = SecuritySchemeType.Http,
+                        Scheme = "bearer",
+                        BearerFormat = "JWT",
+                        In = ParameterLocation.Header,
+                        Name = "Authorization",
+                        Description = "JWT из Login или RegisterUser"
+                    });
+
+                    options.AddSecurityRequirement(document => new OpenApiSecurityRequirement
+                    {
+                        [new OpenApiSecuritySchemeReference("Bearer", document)] = []
+                    });
+
                 });
 
                 services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -84,7 +101,32 @@ namespace OtusWebAuction
             app.MapControllers();
             app.UseSwagger();
             app.UseSwaggerUI(options =>
-                options.SwaggerEndpoint("/swagger/v1/swagger.json", "Order Service v1"));
+            {
+                options.SwaggerEndpoint("/swagger/v1/swagger.json", "Order Service v1");
+                options.UseResponseInterceptor("""
+                    function (response) {
+                        try {
+                            var url = response.url || "";
+                            var isAuth = url.indexOf("Login") >= 0 || url.indexOf("RegisterUser") >= 0;
+                            var raw = typeof response.text === "string" ? response.text : response.data;
+                            if (response.ok && isAuth && typeof raw === "string") {
+                                var payload = JSON.parse(raw);
+                                var token = payload.accessToken || payload.AccessToken;
+                                if (token && window.ui) {
+                                    window.ui.authActions.authorize({
+                                        Bearer: {
+                                            name: "Bearer",
+                                            schema: { type: "http", scheme: "bearer", bearerFormat: "JWT" },
+                                            value: token
+                                        }
+                                    });
+                                }
+                            }
+                        } catch (e) {}
+                        return response;
+                    }
+                    """);
+            });
 
             app.Run();
         }
