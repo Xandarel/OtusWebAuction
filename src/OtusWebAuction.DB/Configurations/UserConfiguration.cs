@@ -18,6 +18,13 @@ namespace OtusWebAuction.DB.Configurations
             builder.HasIndex(x => x.Email).IsUnique();
             builder.Property(x => x.CreatedDate).IsRequired();
             builder.Property(x => x.LastUpdatedDate).IsRequired();
+
+            builder.Property(x => x.RoleId).IsRequired().HasDefaultValue(1L);
+            builder.HasOne(x => x.Role)
+                .WithMany()
+                .HasForeignKey(x => x.RoleId)
+                .IsRequired()
+                .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }

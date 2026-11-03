@@ -29,7 +29,8 @@ namespace OtusWebAuction.BL.Users
                     Id = user.Id,
                     Name = user.Name,
                     Surname = user.Surname,
-                    Email = user.Email
+                    Email = user.Email,
+                    Role = user.Role
                 }
             };
         }

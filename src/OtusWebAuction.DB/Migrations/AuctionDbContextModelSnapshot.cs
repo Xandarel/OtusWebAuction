@@ -22,6 +22,38 @@ namespace OtusWebAuction.DB.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
+            modelBuilder.Entity("OtusWebAuction.DB.Models.Role", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<string>("RoleName")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("RoleName")
+                        .IsUnique();
+
+                    b.ToTable("Roles", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1L,
+                            RoleName = "User"
+                        },
+                        new
+                        {
+                            Id = 2L,
+                            RoleName = "Admin"
+                        });
+                });
+
             modelBuilder.Entity("OtusWebAuction.DB.Models.User", b =>
                 {
                     b.Property<Guid>("Id")
@@ -45,6 +77,11 @@ namespace OtusWebAuction.DB.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<long>("RoleId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasDefaultValue(1L);
+
                     b.Property<string>("Surname")
                         .IsRequired()
                         .HasColumnType("text");
@@ -54,7 +91,20 @@ namespace OtusWebAuction.DB.Migrations
                     b.HasIndex("Email")
                         .IsUnique();
 
+                    b.HasIndex("RoleId");
+
                     b.ToTable("Users", (string)null);
+                });
+
+            modelBuilder.Entity("OtusWebAuction.DB.Models.User", b =>
+                {
+                    b.HasOne("OtusWebAuction.DB.Models.Role", "Role")
+                        .WithMany()
+                        .HasForeignKey("RoleId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Role");
                 });
 #pragma warning restore 612, 618
         }

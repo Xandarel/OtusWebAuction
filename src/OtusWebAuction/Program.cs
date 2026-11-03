@@ -1,4 +1,5 @@
 ﻿
+using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi;
@@ -21,7 +22,8 @@ namespace OtusWebAuction
             // Add services to the container.
             builder.Host.ConfigureServices((context, services) =>
             {
-                services.AddControllers();
+                services.AddControllers().AddJsonOptions(options =>
+                    options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
                 services.AddOpenApi();
                 services.AddEndpointsApiExplorer();
                 services.AddSwaggerGen(options =>
@@ -70,6 +72,8 @@ namespace OtusWebAuction
                             IssuerSigningKey = AuthOptions.GetSymmetricSecurityKey(),
                             // валидация ключа безопасности
                             ValidateIssuerSigningKey = true,
+                            // роль
+                            RoleClaimType = "Role"
                         };
                     });
 

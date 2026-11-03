@@ -1,4 +1,6 @@
-﻿namespace OtusWebAuction.BL.Users.Dto
+﻿using OtusWebAuction.Domain.Enums;
+
+namespace OtusWebAuction.BL.Users.Dto
 {
     public sealed class LoginUserDto
     {
@@ -9,5 +11,7 @@
         public required string Password { get; set; }
 
         public required Guid Id { get; set; }
+
+        public required UserRole Role { get; set; }
     }
 }

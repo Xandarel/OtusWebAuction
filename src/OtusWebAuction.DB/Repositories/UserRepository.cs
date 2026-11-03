@@ -49,7 +49,11 @@ namespace OtusWebAuction.DB.Repositories
 
         public async Task<LoginUserDto?> GetUserByEmail(string email, CancellationToken ct)
         {
-            var user = await dbContext.Users.AsNoTracking().FirstOrDefaultAsync(x => x.Email == email, ct);
+            var user = await dbContext.Users
+                .Include(u => u.Role)
+                .AsNoTracking()
+                .FirstOrDefaultAsync(x => x.Email == email, ct);
+
             if (user is null)
             {
                 return null;
