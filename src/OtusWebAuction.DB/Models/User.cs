@@ -10,5 +10,9 @@
         public DateTime LastUpdatedDate { get; set; }
         public required string Password { get; set; }
         public required string Email { get; set; }
+
+        public long RoleId { get; set; }
+
+        public virtual Role? Role { get; set; }
     }
 }

@@ -16,7 +16,8 @@ namespace OtusWebAuction.Security
 
             Claim[] claims =[
             new(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
-            new(JwtRegisteredClaimNames.Email, user.Email)
+            new(JwtRegisteredClaimNames.Email, user.Email),
+            new ("Role", user.Role.ToString())
             ];
 
             JwtSecurityToken token = new JwtSecurityToken(

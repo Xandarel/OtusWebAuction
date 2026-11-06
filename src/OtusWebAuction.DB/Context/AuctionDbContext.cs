@@ -7,6 +7,8 @@ namespace OtusWebAuction.DB.Context
     {
         public DbSet<User> Users { get; set; }
 
+        public DbSet<Role> Roles { get; set; }
+
         public AuctionDbContext(DbContextOptions<AuctionDbContext> options)
             : base(options)
         {

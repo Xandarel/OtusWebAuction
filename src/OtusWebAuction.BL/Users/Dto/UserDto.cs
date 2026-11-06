@@ -1,4 +1,6 @@
-﻿namespace OtusWebAuction.BL.Users.Dto
+﻿using OtusWebAuction.Domain.Enums;
+
+namespace OtusWebAuction.BL.Users.Dto
 {
     public sealed record UserDto
     {
@@ -7,5 +9,7 @@
         public required string Email { get; set; }
 
         public required Guid Id { get; set; }
+
+        public required UserRole Role { get; set; }
     }
 }
