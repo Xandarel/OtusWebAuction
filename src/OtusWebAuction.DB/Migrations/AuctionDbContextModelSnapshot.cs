@@ -22,6 +22,111 @@ namespace OtusWebAuction.DB.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
+            modelBuilder.Entity("OtusWebAuction.DB.Models.Bet", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<decimal>("AmountRate")
+                        .HasColumnType("numeric");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("CustomerId")
+                        .HasColumnType("uuid");
+
+                    b.Property<long>("LotId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CustomerId");
+
+                    b.HasIndex("LotId");
+
+                    b.ToTable("Bets");
+                });
+
+            modelBuilder.Entity("OtusWebAuction.DB.Models.Category", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int>("ParentId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ParentId");
+
+                    b.ToTable("Categories");
+                });
+
+            modelBuilder.Entity("OtusWebAuction.DB.Models.Lot", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<decimal?>("BuyoutPrice")
+                        .HasColumnType("numeric");
+
+                    b.Property<int>("CategoryId")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime?>("DeleteDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Discription")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("LastUpdatedDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<decimal?>("MinStep")
+                        .HasColumnType("numeric");
+
+                    b.Property<int>("ModerationStatus")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<Guid>("SellerId")
+                        .HasColumnType("uuid");
+
+                    b.Property<decimal?>("StartPrice")
+                        .HasColumnType("numeric");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CategoryId");
+
+                    b.HasIndex("SellerId");
+
+                    b.ToTable("Lots");
+                });
+
             modelBuilder.Entity("OtusWebAuction.DB.Models.Role", b =>
                 {
                     b.Property<long>("Id")
@@ -94,6 +199,60 @@ namespace OtusWebAuction.DB.Migrations
                     b.HasIndex("RoleId");
 
                     b.ToTable("Users", (string)null);
+                });
+
+            modelBuilder.Entity("OtusWebAuction.DB.Models.Bet", b =>
+                {
+                    b.HasOne("OtusWebAuction.DB.Models.User", "Customer")
+                        .WithMany()
+                        .HasForeignKey("CustomerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("OtusWebAuction.DB.Models.Lot", "Lot")
+                        .WithMany("Bets")
+                        .HasForeignKey("LotId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Customer");
+
+                    b.Navigation("Lot");
+                });
+
+            modelBuilder.Entity("OtusWebAuction.DB.Models.Category", b =>
+                {
+                    b.HasOne("OtusWebAuction.DB.Models.Category", "ParentCategory")
+                        .WithMany()
+                        .HasForeignKey("ParentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ParentCategory");
+                });
+
+            modelBuilder.Entity("OtusWebAuction.DB.Models.Lot", b =>
+                {
+                    b.HasOne("OtusWebAuction.DB.Models.Category", "Category")
+                        .WithMany()
+                        .HasForeignKey("CategoryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("OtusWebAuction.DB.Models.User", "User")
+                        .WithMany()
+                        .HasForeignKey("SellerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Category");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("OtusWebAuction.DB.Models.Lot", b =>
+                {
+                    b.Navigation("Bets");
                 });
 
             modelBuilder.Entity("OtusWebAuction.DB.Models.User", b =>

@@ -1,7 +1,10 @@
-﻿namespace OtusWebAuction.DB.Models
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace OtusWebAuction.DB.Models
 {
     public class User
     {
+        [Key]
         public Guid Id { get; set; } = Guid.NewGuid();
 
         public required string Name { get; set; }
