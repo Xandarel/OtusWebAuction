@@ -93,7 +93,7 @@ namespace OtusWebAuction.DB.Migrations
                     b.Property<DateTime?>("DeleteDate")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<string>("Discription")
+                    b.Property<string>("Description")
                         .HasColumnType("text");
 
                     b.Property<DateTime>("LastUpdatedDate")
@@ -102,7 +102,7 @@ namespace OtusWebAuction.DB.Migrations
                     b.Property<decimal?>("MinStep")
                         .HasColumnType("numeric");
 
-                    b.Property<int>("ModerationStatus")
+                    b.Property<int?>("ModerationStatus")
                         .HasColumnType("integer");
 
                     b.Property<string>("Name")
@@ -124,7 +124,7 @@ namespace OtusWebAuction.DB.Migrations
 
                     b.HasIndex("SellerId");
 
-                    b.ToTable("Lots");
+                    b.ToTable("Lots", (string)null);
                 });
 
             modelBuilder.Entity("OtusWebAuction.DB.Models.Role", b =>
@@ -250,11 +250,6 @@ namespace OtusWebAuction.DB.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("OtusWebAuction.DB.Models.Lot", b =>
-                {
-                    b.Navigation("Bets");
-                });
-
             modelBuilder.Entity("OtusWebAuction.DB.Models.User", b =>
                 {
                     b.HasOne("OtusWebAuction.DB.Models.Role", "Role")
@@ -264,6 +259,11 @@ namespace OtusWebAuction.DB.Migrations
                         .IsRequired();
 
                     b.Navigation("Role");
+                });
+
+            modelBuilder.Entity("OtusWebAuction.DB.Models.Lot", b =>
+                {
+                    b.Navigation("Bets");
                 });
 #pragma warning restore 612, 618
         }
