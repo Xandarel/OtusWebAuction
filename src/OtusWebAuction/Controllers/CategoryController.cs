@@ -1,0 +1,29 @@
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using OtusWebAuction.BL.Catrgory;
+using OtusWebAuction.Domain.Enums;
+
+namespace OtusWebAuction.Controllers
+{
+    [ApiController]
+    [Route("[controller]")]
+    public class CategoryController(CategoryHandler categoryHandler) : ControllerBase
+    {
+        [HttpGet]
+        [Authorize]
+        public async Task<ActionResult<IReadOnlyCollection<CategoryDto>> GetAll(CancellationToken ct) => throw new NotImplementedException();
+
+        [HttpGet("{id: int}")]
+        [Authorize]
+        public async Task<ActionResult<CategoryDto>> Get([FromRoute] int id) => throw new NotImplementedException();
+
+        [HttpGet]
+        [Authorize]
+        public async Task<ActionResult<CategoryDto>> GetAllSubcategory(int parentId) => throw new NotImplementedException();
+
+        [HttpPost]
+        [Authorize(Roles = nameof(UserRole.Admin))]
+        public async Task<ActionResult> CreateCategory(CategoryRequest request) => throw new NotImplementedException();
+
+    }
+}

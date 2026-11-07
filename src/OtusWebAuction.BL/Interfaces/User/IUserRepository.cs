@@ -2,7 +2,7 @@
 using OtusWebAuction.BL.Users.Register;
 using OtusWebAuction.BL.Users.Update;
 
-namespace OtusWebAuction.BL.Interfaces
+namespace OtusWebAuction.BL.Interfaces.User
 {
     public interface IUserRepository
     {
