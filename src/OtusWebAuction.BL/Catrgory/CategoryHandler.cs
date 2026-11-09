@@ -6,51 +6,34 @@ namespace OtusWebAuction.BL.Catrgory
 {
     public sealed class CategoryHandler(ICategoryRepository repository)
     {
-        public async Task<CategoryHandlerDto<IReadOnlyCollection<CategoryDto>>> GetAllParentCategory(CancellationToken ct)
+        public Task<CategoryHandlerDto<IReadOnlyCollection<CategoryDto>>> GetAllParentCategory(CancellationToken ct)
+            => ExecuteAsync(repository.GetAllParentCategory, ct);
+        public Task<CategoryHandlerDto<CategoryDto>> GetCategoryById(int id, CancellationToken ct)
+            => ExecuteAsync(ct => repository.GetById(id, ct), ct);
+
+        private async Task<CategoryHandlerDto<T>> ExecuteAsync<T>(
+            Func<CancellationToken, Task<T?>> action,
+            CancellationToken ct) where T : class
         {
-            HandlerStatus status = HandlerStatus.Success;
-            string message = string.Empty;
-            IReadOnlyCollection<CategoryDto>? responce = null;
             try
             {
-                responce = await repository.GetAllParentCategory(ct);
+                T? response = await action(ct);
+                return new CategoryHandlerDto<T>
+                {
+                    Status = HandlerStatus.Success,
+                    Message = string.Empty,
+                    Responce = response
+                };
             }
             catch (Exception ex)
             {
-                message = ex.Message;
-                status = HandlerStatus.Error;
+                return new CategoryHandlerDto<T>
+                {
+                    Status = HandlerStatus.Error,
+                    Message = ex.Message,
+                    Responce = default
+                };
             }
-
-            return new CategoryHandlerDto<IReadOnlyCollection<CategoryDto>>
-            {
-                Message = message,
-                Status = status,
-                Responce = responce
-            };
-        }
-
-        public async Task<CategoryHandlerDto<CategoryDto>> GetCategoryById(int id, CancellationToken ct)
-        {
-
-            HandlerStatus status = HandlerStatus.Success;
-            string message = string.Empty;
-            CategoryDto? item = null;
-            try
-            {
-                item = await repository.GetById(id, ct);
-            }
-            catch (Exception ex)
-            {
-                message = ex.Message;
-                status = HandlerStatus.Error;
-            }
-
-            return new CategoryHandlerDto<CategoryDto>
-            {
-                Message = message,
-                Status = status,
-                Responce = item
-            };
         }
     }
 }

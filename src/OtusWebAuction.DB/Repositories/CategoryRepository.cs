@@ -8,7 +8,7 @@ namespace OtusWebAuction.DB.Repositories
 {
     public class CategoryRepository(AuctionDbContext dbContext) : ICategoryRepository
     {
-        public async Task<IReadOnlyCollection<CategoryDto>?> GetAllParentCategory(CancellationToken ct)
+        public async Task<IReadOnlyCollection<CategoryDto>> GetAllParentCategory(CancellationToken ct)
         {
             List<CategoryDto> responce = new();
             try
