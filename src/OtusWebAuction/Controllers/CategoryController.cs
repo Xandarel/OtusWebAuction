@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using OtusWebAuction.BL.Catrgory;
+using OtusWebAuction.BL.Catrgory.Create;
+using OtusWebAuction.BL.Catrgory.Dto;
 using OtusWebAuction.Domain.Enums;
 
 namespace OtusWebAuction.Controllers
@@ -11,7 +13,7 @@ namespace OtusWebAuction.Controllers
     {
         [HttpGet]
         [Authorize]
-        public async Task<ActionResult<IReadOnlyCollection<CategoryDto>> GetAll(CancellationToken ct) => throw new NotImplementedException();
+        public async Task<ActionResult<IReadOnlyCollection<CategoryDto>>> GetAll(CancellationToken ct) => throw new NotImplementedException();
 
         [HttpGet("{id: int}")]
         [Authorize]
