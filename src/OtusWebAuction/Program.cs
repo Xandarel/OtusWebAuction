@@ -3,7 +3,9 @@ using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi;
+using OtusWebAuction.BL.Catrgory;
 using OtusWebAuction.BL.Interfaces;
+using OtusWebAuction.BL.Interfaces.Categories;
 using OtusWebAuction.BL.Interfaces.User;
 using OtusWebAuction.BL.Users;
 using OtusWebAuction.DB.DI;
@@ -79,7 +81,9 @@ namespace OtusWebAuction
                     });
 
                 services.AddTransient<IUserRepository, UserRepository>();
+                services.AddTransient<ICategoryRepository, CategoryRepository>();
                 services.AddTransient<IUserHandler, UserHandler>();
+                services.AddTransient<CategoryHandler>();
                 services.AddTransient<IPasswordHasher, UserPasswordHasher>();
                 services.AddTransient<JwtTokenFactory>();
                 services.AddOptions<PostgresOptions>().BindConfiguration(PostgresOptions.SectionName);

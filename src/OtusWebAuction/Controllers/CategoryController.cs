@@ -13,11 +13,31 @@ namespace OtusWebAuction.Controllers
     {
         [HttpGet]
         [Authorize]
-        public async Task<ActionResult<IReadOnlyCollection<CategoryDto>>> GetAll(CancellationToken ct) => throw new NotImplementedException();
+        public async Task<ActionResult<IReadOnlyCollection<CategoryDto>>> GetAllPerentCategory(CancellationToken ct)
+        {
+            CategoryHandlerDto<IReadOnlyCollection<CategoryDto>> responce = await categoryHandler.GetAllParentCategory(ct);
+
+            return responce.Status switch
+            {
+                HandlerStatus.Success => Ok(responce.Responce),
+                HandlerStatus.Error => BadRequest(responce.Responce),
+                _ => BadRequest(responce.Responce),
+            };
+        }
 
         [HttpGet("{id: int}")]
         [Authorize]
-        public async Task<ActionResult<CategoryDto>> Get([FromRoute] int id) => throw new NotImplementedException();
+        public async Task<ActionResult<CategoryDto>> Get([FromRoute] int id, CancellationToken ct)
+        {
+            CategoryHandlerDto<CategoryDto> responce = await categoryHandler.GetCategoryById(id, ct);
+
+            return responce.Status switch
+            {
+                HandlerStatus.Success => Ok(responce.Responce),
+                HandlerStatus.Error => BadRequest(responce.Responce),
+                _ => BadRequest(responce.Responce),
+            };
+        }
 
         [HttpGet]
         [Authorize]

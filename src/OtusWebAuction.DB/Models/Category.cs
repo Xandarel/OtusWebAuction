@@ -15,17 +15,19 @@ namespace OtusWebAuction.DB.Models
         /// <summary>
         /// Идентификатор родительской категории
         /// </summary>
-        public int ParentId { get; set; }
+        public int? ParentId { get; set; }
 
         /// <summary>
         /// Родительская категория
         /// </summary>
         [ForeignKey("ParentId")]
-        public required virtual Category ParentCategory { get; set; }
+        public virtual Category? ParentCategory { get; set; }
 
         /// <summary>
         /// Наименование категории
         /// </summary>
         public required string Name { get; set; }
+
+        public required bool IsActive { get; set; }
     }
 }
