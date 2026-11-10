@@ -41,11 +41,15 @@ namespace OtusWebAuction.Controllers
 
         [HttpGet]
         [Authorize]
-        public async Task<ActionResult<CategoryDto>> GetAllSubcategory(int parentId) => throw new NotImplementedException();
+        public async Task<ActionResult<IReadOnlyCollection<CategoryDto>>> GetAllSubcategory(int parentId) => throw new NotImplementedException();
 
         [HttpPost]
         [Authorize(Roles = nameof(UserRole.Admin))]
-        public async Task<ActionResult> CreateCategory(CategoryRequest request) => throw new NotImplementedException();
+        public async Task<ActionResult> CreateCategory(CategoryRequest request)
+        {
+            await categoryHandler.CreateCategory(request);
 
+            return Ok();
+        }
     }
 }

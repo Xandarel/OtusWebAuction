@@ -1,4 +1,5 @@
-﻿using OtusWebAuction.BL.Catrgory.Dto;
+﻿using OtusWebAuction.BL.Catrgory.Create;
+using OtusWebAuction.BL.Catrgory.Dto;
 using OtusWebAuction.BL.Interfaces.Categories;
 using OtusWebAuction.Domain.Enums;
 
@@ -6,6 +7,10 @@ namespace OtusWebAuction.BL.Catrgory
 {
     public sealed class CategoryHandler(ICategoryRepository repository)
     {
+        public async Task CreateCategory(CategoryRequest request)
+        {
+
+        }
         public Task<CategoryHandlerDto<IReadOnlyCollection<CategoryDto>>> GetAllParentCategory(CancellationToken ct)
             => ExecuteAsync(repository.GetAllParentCategory, ct);
         public Task<CategoryHandlerDto<CategoryDto>> GetCategoryById(int id, CancellationToken ct)
