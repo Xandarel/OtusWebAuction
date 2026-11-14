@@ -45,9 +45,9 @@ namespace OtusWebAuction.Controllers
 
         [HttpPost]
         [Authorize(Roles = nameof(UserRole.Admin))]
-        public async Task<ActionResult> CreateCategory(CategoryRequest request)
+        public async Task<ActionResult> CreateCategory(CategoryRequest request, CancellationToken ct)
         {
-            await categoryHandler.CreateCategory(request);
+            await categoryHandler.CreateCategory(request, ct);
 
             return Ok();
         }

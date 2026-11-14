@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using OtusWebAuction.BL.Catrgory.Create;
 using OtusWebAuction.BL.Catrgory.Dto;
 using OtusWebAuction.BL.Interfaces.Categories;
 using OtusWebAuction.DB.Context;
@@ -8,6 +9,13 @@ namespace OtusWebAuction.DB.Repositories
 {
     public class CategoryRepository(AuctionDbContext dbContext) : ICategoryRepository
     {
+        public async Task CreateCategory(CategoryRequest request, CancellationToken ct)
+        {
+            var category = CategoryMapper.ToCategory(request);
+            await dbContext.Categories.AddAsync(category, ct);
+            await dbContext.SaveChangesAsync(ct);
+        }
+
         public async Task<IReadOnlyCollection<CategoryDto>> GetAllParentCategory(CancellationToken ct)
         {
             List<CategoryDto> responce = new();

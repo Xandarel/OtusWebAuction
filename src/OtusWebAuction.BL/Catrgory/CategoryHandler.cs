@@ -7,10 +7,7 @@ namespace OtusWebAuction.BL.Catrgory
 {
     public sealed class CategoryHandler(ICategoryRepository repository)
     {
-        public async Task CreateCategory(CategoryRequest request)
-        {
-
-        }
+        public async Task CreateCategory(CategoryRequest request, CancellationToken ct) => await repository.CreateCategory(request, ct);
         public Task<CategoryHandlerDto<IReadOnlyCollection<CategoryDto>>> GetAllParentCategory(CancellationToken ct)
             => ExecuteAsync(repository.GetAllParentCategory, ct);
         public Task<CategoryHandlerDto<CategoryDto>> GetCategoryById(int id, CancellationToken ct)
