@@ -1,0 +1,6 @@
+@OtusWebAuction_HostAddress = http://localhost:5134
+
+GET {{OtusWebAuction_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
