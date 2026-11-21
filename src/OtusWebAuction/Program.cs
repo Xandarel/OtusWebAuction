@@ -11,6 +11,7 @@ using OtusWebAuction.DB.Options;
 using OtusWebAuction.DB.Repositories;
 using OtusWebAuction.Options;
 using OtusWebAuction.Security;
+using Serilog;
 
 namespace OtusWebAuction
 {
@@ -20,9 +21,17 @@ namespace OtusWebAuction
         {
             WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
+            //TODO: писать логи не только в консоль
+            Log.Logger = new LoggerConfiguration()
+                .ReadFrom.Configuration(builder.Configuration)
+                .WriteTo.Console()
+                .CreateLogger();
+
+            builder.Host.UseSerilog();
             // Add services to the container.
             builder.Host.ConfigureServices((context, services) =>
             {
+                services.AddSerilog();
                 services.AddControllers().AddJsonOptions(options =>
                     options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
                 services.AddOpenApi();
