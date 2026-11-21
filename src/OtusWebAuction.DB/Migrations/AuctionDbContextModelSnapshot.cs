@@ -59,18 +59,21 @@ namespace OtusWebAuction.DB.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<int>("ParentId")
+                    b.Property<int?>("ParentId")
                         .HasColumnType("integer");
 
                     b.HasKey("Id");
 
                     b.HasIndex("ParentId");
 
-                    b.ToTable("Categories");
+                    b.ToTable("Categories", (string)null);
                 });
 
             modelBuilder.Entity("OtusWebAuction.DB.Models.Lot", b =>
@@ -222,13 +225,12 @@ namespace OtusWebAuction.DB.Migrations
 
             modelBuilder.Entity("OtusWebAuction.DB.Models.Category", b =>
                 {
-                    b.HasOne("OtusWebAuction.DB.Models.Category", "ParentCategory")
-                        .WithMany()
+                    b.HasOne("OtusWebAuction.DB.Models.Category", "Parent")
+                        .WithMany("Children")
                         .HasForeignKey("ParentId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
-                    b.Navigation("ParentCategory");
+                    b.Navigation("Parent");
                 });
 
             modelBuilder.Entity("OtusWebAuction.DB.Models.Lot", b =>
@@ -259,6 +261,11 @@ namespace OtusWebAuction.DB.Migrations
                         .IsRequired();
 
                     b.Navigation("Role");
+                });
+
+            modelBuilder.Entity("OtusWebAuction.DB.Models.Category", b =>
+                {
+                    b.Navigation("Children");
                 });
 
             modelBuilder.Entity("OtusWebAuction.DB.Models.Lot", b =>

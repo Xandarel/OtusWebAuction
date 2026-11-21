@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using OtusWebAuction.BL.Users;
+using OtusWebAuction.BL.Interfaces;
 using OtusWebAuction.BL.Users.Dto;
 using OtusWebAuction.BL.Users.Login;
 using OtusWebAuction.BL.Users.Register;
@@ -12,7 +12,7 @@ namespace OtusWebAuction.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    public class UserController(UserHandler userHandler, JwtTokenFactory jwtTokenFactory) : ControllerBase
+    public class UserController(IUserHandler userHandler, JwtTokenFactory jwtTokenFactory) : ControllerBase
     {
         [AllowAnonymous]
         [HttpPost("RegisterUser")]

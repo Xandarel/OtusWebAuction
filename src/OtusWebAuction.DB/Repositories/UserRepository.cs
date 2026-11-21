@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using OtusWebAuction.BL.Interfaces;
+using OtusWebAuction.BL.Interfaces.User;
 using OtusWebAuction.BL.Users.Dto;
 using OtusWebAuction.BL.Users.Register;
 using OtusWebAuction.BL.Users.Update;

@@ -1,4 +1,5 @@
 ﻿using OtusWebAuction.BL.Interfaces;
+using OtusWebAuction.BL.Interfaces.User;
 using OtusWebAuction.BL.Users.Dto;
 using OtusWebAuction.BL.Users.Login;
 using OtusWebAuction.BL.Users.Register;
@@ -7,7 +8,7 @@ using OtusWebAuction.Domain.Enums;
 
 namespace OtusWebAuction.BL.Users
 {
-    public sealed class UserHandler(IUserRepository userRepository, IPasswordHasher passwordHasher)
+    public sealed class UserHandler(IUserRepository userRepository, IPasswordHasher passwordHasher) : IUserHandler
     {
         public async Task<AuthUserDto> LoginUser(LoginUserRequest request, CancellationToken ct)
         {
