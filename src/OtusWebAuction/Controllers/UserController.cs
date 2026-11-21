@@ -1,6 +1,4 @@
-﻿using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using OtusWebAuction.BL.Interfaces;
 using OtusWebAuction.BL.Users.Dto;
@@ -46,7 +44,11 @@ namespace OtusWebAuction.Controllers
         [HttpPatch("UpdateUser")]
         public async Task<ActionResult<UserDto>> UpdateUser(UpdateUserRequest request, CancellationToken ct)
         {
-            var userId = Guid.Parse(User.FindFirstValue(JwtRegisteredClaimNames.Sub)!);
+            if (User.GetUserId() is not { } userId)
+            {
+                return Unauthorized();
+            }
+
             AuthUserDto result = await userHandler.UpdateUser(userId, request, ct);
             return result.Status == UserStatus.Updated
                 ? Ok(result.Responce)
