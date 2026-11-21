@@ -95,6 +95,18 @@ namespace OtusWebAuction
                             // роль
                             RoleClaimType = "Role"
                         };
+
+                        options.Events = new JwtBearerEvents
+                        {
+                            OnAuthenticationFailed = context =>
+                            {
+                                var logger = context.HttpContext.RequestServices
+                                    .GetRequiredService<ILoggerFactory>()
+                                    .CreateLogger("JwtBearer");
+                                logger.LogWarning(context.Exception, "JWT отклонён для {Path}", context.Request.Path);
+                                return Task.CompletedTask;
+                            }
+                        };
                     });
 
                 services.AddTransient<IUserRepository, UserRepository>();
