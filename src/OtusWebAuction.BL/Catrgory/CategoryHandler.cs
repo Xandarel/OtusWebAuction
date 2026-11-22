@@ -1,11 +1,12 @@
-﻿using OtusWebAuction.BL.Catrgory.Create;
+﻿using Microsoft.Extensions.Logging;
+using OtusWebAuction.BL.Catrgory.Create;
 using OtusWebAuction.BL.Catrgory.Dto;
 using OtusWebAuction.BL.Interfaces.Categories;
 using OtusWebAuction.Domain.Enums;
 
 namespace OtusWebAuction.BL.Catrgory
 {
-    public sealed class CategoryHandler(ICategoryRepository repository)
+    public sealed class CategoryHandler(ICategoryRepository repository, ILogger<CategoryHandler> logger) : ICategoryHandler
     {
         public async Task CreateCategory(CategoryRequest request, CancellationToken ct) => await repository.CreateCategory(request, ct);
         public Task<CategoryHandlerDto<IReadOnlyCollection<CategoryDto>>> GetAllParentCategory(CancellationToken ct)
@@ -20,6 +21,7 @@ namespace OtusWebAuction.BL.Catrgory
             try
             {
                 T? response = await action(ct);
+                logger.LogInformation("CategoryHandler executed succes");
                 return new CategoryHandlerDto<T>
                 {
                     Status = HandlerStatus.Success,
@@ -29,6 +31,7 @@ namespace OtusWebAuction.BL.Catrgory
             }
             catch (Exception ex)
             {
+                logger.LogError(ex, "CategoryHandler executed with error");
                 return new CategoryHandlerDto<T>
                 {
                     Status = HandlerStatus.Error,

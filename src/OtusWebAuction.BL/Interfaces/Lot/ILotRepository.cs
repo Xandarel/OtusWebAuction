@@ -1,7 +1,7 @@
 ﻿using OtusWebAuction.BL.Lots.Dto;
 using OtusWebAuction.BL.Lots.Request;
 
-namespace OtusWebAuction.BL.Interfaces
+namespace OtusWebAuction.BL.Interfaces.Lot
 {
     public interface ILotRepository
     {

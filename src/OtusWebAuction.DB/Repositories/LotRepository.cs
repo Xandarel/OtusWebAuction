@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using OtusWebAuction.BL.Interfaces;
+using Microsoft.Extensions.Logging;
+using OtusWebAuction.BL.Interfaces.Lot;
 using OtusWebAuction.BL.Lots.Dto;
 using OtusWebAuction.BL.Lots.Request;
 using OtusWebAuction.DB.Context;
@@ -9,7 +10,7 @@ using OtusWebAuction.Domain.Enums;
 
 namespace OtusWebAuction.DB.Repositories
 {
-    public sealed class LotRepository(AuctionDbContext dbContext) : ILotRepository
+    public sealed class LotRepository(AuctionDbContext dbContext, ILogger<LotRepository> logger) : ILotRepository
     {
         public async Task<LotDto?> GetByIdAsync(long id, CancellationToken ct)
         {
@@ -18,6 +19,7 @@ namespace OtusWebAuction.DB.Repositories
                 .FirstOrDefaultAsync(x => x.Id == id, ct);
             if (lot is null)
             {
+                logger.LogWarning("Lot with id {id} not found", id);
                 return null;
             }
 
@@ -38,6 +40,7 @@ namespace OtusWebAuction.DB.Repositories
             lot.LastUpdatedDate = now;
             await dbContext.Lots.AddAsync(lot, ct);
             await dbContext.SaveChangesAsync(ct);
+            logger.LogInformation("Lot created successfully with id {id} for seller {sellerId}", lot.Id, sellerId);
             return LotMapper.ToLotDto(lot);
         }
 
@@ -47,6 +50,7 @@ namespace OtusWebAuction.DB.Repositories
                 .FirstOrDefaultAsync(x => x.Id == id, ct);
             if (lot is null)
             {
+                logger.LogWarning("UpdateLot отклонён: лот с id {id} не найден", id);
                 return null;
             }
 
@@ -62,6 +66,7 @@ namespace OtusWebAuction.DB.Repositories
                 .FirstOrDefaultAsync(x => x.Id == id, ct);
             if (lot is null)
             {
+                logger.LogWarning("DeleteLot отклонён: лот с id {id} не найден", id);
                 return false;
             }
 
@@ -77,6 +82,7 @@ namespace OtusWebAuction.DB.Repositories
                 .FirstOrDefaultAsync(x => x.Id == id, ct);
             if (lot is null)
             {
+                logger.LogWarning("SendToModerate отклонён: лот с id {id} не найден", id);
                 return null;
             }
 
@@ -92,6 +98,7 @@ namespace OtusWebAuction.DB.Repositories
                 .FirstOrDefaultAsync(x => x.Id == id, ct);
             if (lot is null)
             {
+                logger.LogWarning("ApproveModerate отклонён: лот с id {id} не найден", id);
                 return null;
             }
 
@@ -107,6 +114,7 @@ namespace OtusWebAuction.DB.Repositories
                 .FirstOrDefaultAsync(x => x.Id == id, ct);
             if (lot is null)
             {
+                logger.LogWarning("RejectLot отклонён: лот с id {id} не найден", id);
                 return null;
             }
 

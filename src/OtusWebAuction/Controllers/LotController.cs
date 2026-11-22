@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using OtusWebAuction.BL.Lots;
+using OtusWebAuction.BL.Interfaces.Lot;
 using OtusWebAuction.BL.Lots.Dto;
 using OtusWebAuction.BL.Lots.Request;
 using OtusWebAuction.Domain.Enums;
@@ -10,7 +10,7 @@ namespace OtusWebAuction.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    public class LotController(LotHandler lotHandler) : ControllerBase
+    public class LotController(ILotHandler lotHandler, ILogger<LotController> logger) : ControllerBase
     {
         [Authorize]
         [HttpPost("CreateLot")]
@@ -18,10 +18,12 @@ namespace OtusWebAuction.Controllers
         {
             if (User.GetUserId() is not { } sellerId)
             {
+                logger.LogWarning("CreateLot отклонён: в токене нет корректного sub");
                 return Unauthorized();
             }
 
             LotResultDto result = await lotHandler.CreateLot(request, sellerId, ct);
+            logger.LogInformation("CreateLot result for seller {sellerId}: {status}", sellerId, result.Status);
             return result.Status switch
             {
                 LotResultStatus.Created => StatusCode(StatusCodes.Status201Created, result.Response),
@@ -35,10 +37,12 @@ namespace OtusWebAuction.Controllers
         {
             if (User.GetUserId() is not { } sellerId)
             {
+                logger.LogWarning("UpdateLot отклонён: в токене нет корректного sub");
                 return Unauthorized();
             }
 
             LotResultDto result = await lotHandler.UpdateLot(id, request, sellerId, ct);
+            logger.LogInformation("UpdateLot result for seller {sellerId}: {status}", sellerId, result.Status);
             return result.Status switch
             {
                 LotResultStatus.Updated => Ok(result.Response),
@@ -52,10 +56,12 @@ namespace OtusWebAuction.Controllers
         {
             if (User.GetUserId() is not { } sellerId)
             {
+                logger.LogWarning("DeleteLot отклонён: в токене нет корректного sub");
                 return Unauthorized();
             }
 
             LotResultDto result = await lotHandler.DeleteLot(id, sellerId, ct);
+            logger.LogInformation("DeleteLot result for seller {sellerId}: {status}", sellerId, result.Status);
             return result.Status switch
             {
                 LotResultStatus.Deleted => NoContent(),
@@ -69,10 +75,12 @@ namespace OtusWebAuction.Controllers
         {
             if (User.GetUserId() is not { } sellerId)
             {
+                logger.LogWarning("SendToModerate отклонён: в токене нет корректного sub");
                 return Unauthorized();
             }
 
             LotResultDto result = await lotHandler.SendToModerate(id, sellerId, ct);
+            logger.LogInformation("SendToModerate result for seller {sellerId}: {status}", sellerId, result.Status);
             return result.Status switch
             {
                 LotResultStatus.SentToModerate => Ok(result.Response),
@@ -85,6 +93,7 @@ namespace OtusWebAuction.Controllers
         public async Task<IActionResult> ApproveModerate(long id, CancellationToken ct)
         {
             LotResultDto result = await lotHandler.ApproveModerate(id, ct);
+            logger.LogInformation("ApproveModerate result for lot {id}: {status}", id, result.Status);
             return result.Status switch
             {
                 LotResultStatus.Approved => Ok(result.Response),
@@ -97,6 +106,7 @@ namespace OtusWebAuction.Controllers
         public async Task<IActionResult> GetLot(long id, CancellationToken ct)
         {
             LotResultDto result = await lotHandler.GetLot(id, ct);
+            logger.LogInformation("GetLot result for lot {id}: {status}", id, result.Status);
             return result.Status switch
             {
                 LotResultStatus.Found => Ok(result.Response),
@@ -109,6 +119,7 @@ namespace OtusWebAuction.Controllers
         public async Task<IActionResult> RejectLot(long id, CancellationToken ct)
         {
             LotResultDto result = await lotHandler.RejectLot(id, ct);
+            logger.LogInformation("RejectLot result for lot {id}: {status}", id, result.Status);
             return result.Status switch
             {
                 LotResultStatus.Rejected => Ok(result.Response),

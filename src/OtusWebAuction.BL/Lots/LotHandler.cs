@@ -1,17 +1,19 @@
-﻿using OtusWebAuction.BL.Interfaces;
+﻿using Microsoft.Extensions.Logging;
+using OtusWebAuction.BL.Interfaces.Lot;
 using OtusWebAuction.BL.Lots.Dto;
 using OtusWebAuction.BL.Lots.Request;
 using OtusWebAuction.Domain.Enums;
 
 namespace OtusWebAuction.BL.Lots
 {
-    public sealed class LotHandler(ILotRepository lotRepository)
+    public sealed class LotHandler(ILotRepository lotRepository, ILogger<LotHandler> logger) : ILotHandler
     {
         public async Task<LotResultDto> GetLot(long id, CancellationToken ct)
         {
             LotDto? lot = await lotRepository.GetByIdAsync(id, ct);
             if (lot is null)
             {
+                logger.LogWarning("GetLot отклонён: лот с id {id} не найден", id);
                 return NotFound(id);
             }
 
@@ -27,6 +29,7 @@ namespace OtusWebAuction.BL.Lots
             string? error = ValidatePrices(request.StartPrice, request.BuyoutPrice, request.MinStep);
             if (error is not null)
             {
+                logger.LogWarning("CreateLot отклонён: некорректные данные от продавца {sellerId}: {error}", sellerId, error);
                 return new LotResultDto
                 {
                     Status = LotResultStatus.InvalidData,
@@ -57,12 +60,14 @@ namespace OtusWebAuction.BL.Lots
             LotDto? lot = await lotRepository.GetByIdAsync(id, ct);
             if (lot is null)
             {
+                logger.LogWarning("UpdateLot отклонён: лот с id {id} не найден", id);
                 return NotFound(id);
             }
 
             //TODO добавить возможность редактирования админом
             if (lot.SellerId != sellerId)
             {
+                logger.LogWarning("UpdateLot отклонён: продавец {sellerId} не является владельцем лота {id}", sellerId, id);
                 return new LotResultDto
                 {
                     Status = LotResultStatus.NotOwner,
@@ -73,6 +78,7 @@ namespace OtusWebAuction.BL.Lots
             string? error = ValidatePrices(request.StartPrice, request.BuyoutPrice, request.MinStep);
             if (error is not null)
             {
+                logger.LogWarning("UpdateLot отклонён: некорректные данные от продавца {sellerId}: {error}", sellerId, error);
                 return new LotResultDto
                 {
                     Status = LotResultStatus.InvalidData,
@@ -83,6 +89,7 @@ namespace OtusWebAuction.BL.Lots
             if (request.CategoryId is not null
                 && !await lotRepository.CategoryExistsAsync(request.CategoryId.Value, ct))
             {
+                logger.LogWarning("UpdateLot отклонён: категория с id {categoryId} не найдена", request.CategoryId.Value);
                 return new LotResultDto
                 {
                     Status = LotResultStatus.InvalidData,
@@ -93,9 +100,11 @@ namespace OtusWebAuction.BL.Lots
             LotDto? updated = await lotRepository.UpdateLotAsync(id, request, ct);
             if (updated is null)
             {
+                logger.LogWarning("UpdateLot отклонён: лот с id {id} не найден при обновлении", id);
                 return NotFound(id);
             }
 
+            logger.LogInformation("Успешное обновление лота {id} продавцом {sellerId}", id, sellerId);
             return new LotResultDto
             {
                 Status = LotResultStatus.Updated,
@@ -108,6 +117,7 @@ namespace OtusWebAuction.BL.Lots
             LotDto? lot = await lotRepository.GetByIdAsync(id, ct);
             if (lot is null)
             {
+                logger.LogWarning("DeleteLot отклонён: лот с id {id} не найден", id);
                 return NotFound(id);
             }
 
@@ -134,11 +144,14 @@ namespace OtusWebAuction.BL.Lots
             LotDto? lot = await lotRepository.GetByIdAsync(id, ct);
             if (lot is null)
             {
+                logger.LogWarning("SendToModerate отклонён: лот с id {id} не найден", id);
                 return NotFound(id);
             }
 
             if (lot.SellerId != sellerId)
             {
+                logger.LogWarning("SendToModerate отклонён: продавец {sellerId} не является владельцем лота {id}",
+                    sellerId, id);
                 return new LotResultDto
                 {
                     Status = LotResultStatus.NotOwner,
@@ -148,6 +161,8 @@ namespace OtusWebAuction.BL.Lots
 
             if (lot.ModerationStatus is ModerationStatus.Moderating or ModerationStatus.Approved)
             {
+                logger.LogWarning("SendToModerate отклонён: лот с id {id} уже отправлен на модерацию или прошёл её",
+                    id);
                 return new LotResultDto
                 {
                     Status = LotResultStatus.InvalidData,
@@ -158,6 +173,7 @@ namespace OtusWebAuction.BL.Lots
             LotDto? updated = await lotRepository.SendToModerateAsync(id, ct);
             if (updated is null)
             {
+                logger.LogWarning("SendToModerate отклонён: лот с id {id} не найден при обновлении", id);
                 return NotFound(id);
             }
 
@@ -175,11 +191,13 @@ namespace OtusWebAuction.BL.Lots
             LotDto? lot = await lotRepository.GetByIdAsync(id, ct);
             if (lot is null)
             {
+                logger.LogWarning("ApproveModerate отклонён: лот с id {id} не найден", id);
                 return NotFound(id);
             }
 
             if (lot.ModerationStatus != ModerationStatus.Moderating)
             {
+                logger.LogWarning("ApproveModerate отклонён: лот с id {id} не находится на модерации", id);
                 return new LotResultDto
                 {
                     Status = LotResultStatus.InvalidData,
@@ -190,6 +208,7 @@ namespace OtusWebAuction.BL.Lots
             LotDto? updated = await lotRepository.ApproveModerate(id, ct);
             if (updated is null)
             {
+                logger.LogWarning("ApproveModerate отклонён: лот с id {id} не найден при обновлении", id);
                 return NotFound(id);
             }
 
@@ -207,11 +226,13 @@ namespace OtusWebAuction.BL.Lots
             LotDto? lot = await lotRepository.GetByIdAsync(id, ct);
             if (lot is null)
             {
+                logger.LogWarning("RejectLot отклонён: лот с id {id} не найден", id);
                 return NotFound(id);
             }
 
             if (lot.ModerationStatus != ModerationStatus.Moderating)
             {
+                logger.LogWarning("RejectLot отклонён: лот с id {id} не находится на модерации", id);
                 return new LotResultDto
                 {
                     Status = LotResultStatus.InvalidData,
@@ -222,6 +243,7 @@ namespace OtusWebAuction.BL.Lots
             LotDto? updated = await lotRepository.RejectLotAsync(id, ct);
             if (updated is null)
             {
+                logger.LogWarning("RejectLot отклонён: лот с id {id} не найден при обновлении", id);
                 return NotFound(id);
             }
 
