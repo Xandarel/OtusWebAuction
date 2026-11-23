@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using OtusWebAuction.Domain.Enums;
 
 namespace OtusWebAuction.DB.Models
 {
@@ -10,38 +11,38 @@ namespace OtusWebAuction.DB.Models
         /// </summary>
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public required long Id { get; init; }
+        public long Id { get; init; }
 
         /// <summary>
         /// Наименование лота
         /// </summary>
-        public required string Name { get; init; }
+        public required string Name { get; set; }
 
         /// <summary>
         /// Подробное описание лота
         /// </summary>
-        public string? Discription { get; init; }
+        public string? Description { get; set; }
 
         /// <summary>
         /// Идентификатор категории лота
         /// </summary>
-        public int CategoryId { get; init; }
+        public int CategoryId { get; set; }
 
         /// <summary>
         /// Категория лота
         /// </summary>
-        public required virtual Category Category { get; init; }
+        public virtual Category Category { get; init; } = null!;
 
         /// <summary>
         /// Идентификатор продавца
         /// </summary>
-        public Guid SellerId { get; init; }
+        public Guid SellerId { get; set; }
 
         /// <summary>
         /// Продавец
         /// </summary>
         [ForeignKey("SellerId")]
-        public required virtual User User { get; set; }
+        public virtual User User { get; set; } = null!;
 
         /// <summary>
         /// Стартовая цена
@@ -61,12 +62,12 @@ namespace OtusWebAuction.DB.Models
         /// <summary>
         /// Статус лота
         /// </summary>
-        public int Status { get; init; }
+        public LotStatus Status { get; set; }
 
         /// <summary>
-        /// Статус модерации лота - Одобрен / не одобрен
+        /// Статус модерации лота. null - лот ещё не отправлен на модерацию
         /// </summary>
-        public int ModerationStatus { get; init; }
+        public ModerationStatus? ModerationStatus { get; set; }
 
         /// <summary>
         /// Дата создания

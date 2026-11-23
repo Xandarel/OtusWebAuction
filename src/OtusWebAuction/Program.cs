@@ -7,6 +7,7 @@ using OtusWebAuction.BL.Catrgory;
 using OtusWebAuction.BL.Interfaces;
 using OtusWebAuction.BL.Interfaces.Categories;
 using OtusWebAuction.BL.Interfaces.User;
+using OtusWebAuction.BL.Lots;
 using OtusWebAuction.BL.Users;
 using OtusWebAuction.DB.DI;
 using OtusWebAuction.DB.Options;
@@ -59,6 +60,13 @@ namespace OtusWebAuction
                 services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                     .AddJwtBearer(options =>
                     {
+                        // JwtBearer валидирует токен через TokenHandlers (JsonWebTokenHandler);
+                        // SecurityTokenValidators используется только при UseSecurityTokenValidators = true,
+                        // поэтому очистка InboundClaimTypeMap у JwtSecurityTokenHandler здесь не работает.
+                        // MapInboundClaims = true по умолчанию превращает "sub" в ClaimTypes.NameIdentifier,
+                        // поэтому отключаем маппинг: claim'ы приходят с исходными именами (sub, email, Role).
+                        options.MapInboundClaims = false;
+
                         options.TokenValidationParameters = new TokenValidationParameters
                         {
                             // указывает, будет ли валидироваться издатель при валидации токена
@@ -84,6 +92,9 @@ namespace OtusWebAuction
                 services.AddTransient<ICategoryRepository, CategoryRepository>();
                 services.AddTransient<IUserHandler, UserHandler>();
                 services.AddTransient<CategoryHandler>();
+                services.AddTransient<UserHandler>();
+                services.AddTransient<ILotRepository, LotRepository>();
+                services.AddTransient<LotHandler>();
                 services.AddTransient<IPasswordHasher, UserPasswordHasher>();
                 services.AddTransient<JwtTokenFactory>();
                 services.AddOptions<PostgresOptions>().BindConfiguration(PostgresOptions.SectionName);

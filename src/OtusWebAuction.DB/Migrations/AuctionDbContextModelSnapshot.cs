@@ -59,18 +59,21 @@ namespace OtusWebAuction.DB.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<int>("ParentId")
+                    b.Property<int?>("ParentId")
                         .HasColumnType("integer");
 
                     b.HasKey("Id");
 
                     b.HasIndex("ParentId");
 
-                    b.ToTable("Categories");
+                    b.ToTable("Categories", (string)null);
                 });
 
             modelBuilder.Entity("OtusWebAuction.DB.Models.Lot", b =>
@@ -93,7 +96,7 @@ namespace OtusWebAuction.DB.Migrations
                     b.Property<DateTime?>("DeleteDate")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<string>("Discription")
+                    b.Property<string>("Description")
                         .HasColumnType("text");
 
                     b.Property<DateTime>("LastUpdatedDate")
@@ -102,7 +105,7 @@ namespace OtusWebAuction.DB.Migrations
                     b.Property<decimal?>("MinStep")
                         .HasColumnType("numeric");
 
-                    b.Property<int>("ModerationStatus")
+                    b.Property<int?>("ModerationStatus")
                         .HasColumnType("integer");
 
                     b.Property<string>("Name")
@@ -124,7 +127,7 @@ namespace OtusWebAuction.DB.Migrations
 
                     b.HasIndex("SellerId");
 
-                    b.ToTable("Lots");
+                    b.ToTable("Lots", (string)null);
                 });
 
             modelBuilder.Entity("OtusWebAuction.DB.Models.Role", b =>
@@ -222,13 +225,12 @@ namespace OtusWebAuction.DB.Migrations
 
             modelBuilder.Entity("OtusWebAuction.DB.Models.Category", b =>
                 {
-                    b.HasOne("OtusWebAuction.DB.Models.Category", "ParentCategory")
-                        .WithMany()
+                    b.HasOne("OtusWebAuction.DB.Models.Category", "Parent")
+                        .WithMany("Children")
                         .HasForeignKey("ParentId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
-                    b.Navigation("ParentCategory");
+                    b.Navigation("Parent");
                 });
 
             modelBuilder.Entity("OtusWebAuction.DB.Models.Lot", b =>
@@ -250,11 +252,6 @@ namespace OtusWebAuction.DB.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("OtusWebAuction.DB.Models.Lot", b =>
-                {
-                    b.Navigation("Bets");
-                });
-
             modelBuilder.Entity("OtusWebAuction.DB.Models.User", b =>
                 {
                     b.HasOne("OtusWebAuction.DB.Models.Role", "Role")
@@ -264,6 +261,16 @@ namespace OtusWebAuction.DB.Migrations
                         .IsRequired();
 
                     b.Navigation("Role");
+                });
+
+            modelBuilder.Entity("OtusWebAuction.DB.Models.Category", b =>
+                {
+                    b.Navigation("Children");
+                });
+
+            modelBuilder.Entity("OtusWebAuction.DB.Models.Lot", b =>
+                {
+                    b.Navigation("Bets");
                 });
 #pragma warning restore 612, 618
         }
