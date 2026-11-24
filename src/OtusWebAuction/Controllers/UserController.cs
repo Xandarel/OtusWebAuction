@@ -26,10 +26,12 @@ namespace OtusWebAuction.Controllers
                 logger.LogWarning("Пользователь {user} не создан по причине {message}",
                     request.Email,
                     result.Message);
+
                 return ToError(result);
             }
 
             logger.LogInformation("Пользователь {user} создан", request.Email);
+
             return Ok(new AuthResponse(result.Responce!, jwtTokenFactory.Create(result.Responce!)));
         }
 
@@ -43,10 +45,12 @@ namespace OtusWebAuction.Controllers
                 logger.LogWarning("Пользователь {user} не смог войти в систему по причине {message}",
                     request.Email,
                     result.Message);
+
                 return ToError(result);
             }
 
             logger.LogInformation("Пользователь {user} авторизован", request.Email);
+
             return Ok(new AuthResponse(result.Responce!, jwtTokenFactory.Create(result.Responce!)));
         }
 
@@ -57,10 +61,12 @@ namespace OtusWebAuction.Controllers
             if (User.GetUserId() is not { } userId)
             {
                 logger.LogWarning("UpdateUser отклонён: в токене нет корректного sub");
+
                 return Unauthorized();
             }
 
             AuthUserDto result = await userHandler.UpdateUser(userId, request, ct);
+
             return result.Status == UserStatus.Updated
                 ? Ok(result.Responce)
                 : ToError(result);

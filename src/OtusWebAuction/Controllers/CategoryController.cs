@@ -17,6 +17,7 @@ namespace OtusWebAuction.Controllers
         {
             CategoryHandlerDto<IReadOnlyCollection<CategoryDto>> responce = await categoryHandler.GetAllParentCategory(ct);
             logger.LogInformation("Get all parent category responce: {responce}", responce.Status);
+
             return responce.Status switch
             {
                 HandlerStatus.Success => Ok(responce.Responce),
@@ -31,6 +32,7 @@ namespace OtusWebAuction.Controllers
         {
             CategoryHandlerDto<CategoryDto> responce = await categoryHandler.GetCategoryById(id, ct);
             logger.LogInformation("Get category by id {id} with status {status}", id, responce.Status);
+
             return responce.Status switch
             {
                 HandlerStatus.Success => Ok(responce.Responce),
@@ -50,6 +52,7 @@ namespace OtusWebAuction.Controllers
             await categoryHandler.CreateCategory(request, ct);
 
             logger.LogInformation("Category created successfully.");
+
             return Ok();
         }
     }
