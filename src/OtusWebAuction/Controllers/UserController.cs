@@ -23,14 +23,8 @@ namespace OtusWebAuction.Controllers
             AuthUserDto result = await userHandler.RegisterUser(request, ct);
             if (result.Status != UserStatus.Created)
             {
-                logger.LogWarning("Пользователь {user} не создан по причине {message}",
-                    request.Email,
-                    result.Message);
-
                 return ToError(result);
             }
-
-            logger.LogInformation("Пользователь {user} создан", request.Email);
 
             return Ok(new AuthResponse(result.Responce!, jwtTokenFactory.Create(result.Responce!)));
         }
@@ -42,14 +36,8 @@ namespace OtusWebAuction.Controllers
             AuthUserDto result = await userHandler.LoginUser(request, ct);
             if (result.Status != UserStatus.Login)
             {
-                logger.LogWarning("Пользователь {user} не смог войти в систему по причине {message}",
-                    request.Email,
-                    result.Message);
-
                 return ToError(result);
             }
-
-            logger.LogInformation("Пользователь {user} авторизован", request.Email);
 
             return Ok(new AuthResponse(result.Responce!, jwtTokenFactory.Create(result.Responce!)));
         }

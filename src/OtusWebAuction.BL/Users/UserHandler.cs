@@ -16,13 +16,16 @@ namespace OtusWebAuction.BL.Users
             LoginUserDto? user = await userRepository.GetUserByEmail(request.Email, ct);
             if (user is null || !passwordHasher.Verify(request.Email, request.Password, user.Password))
             {
-                logger.LogWarning("Login failed for user with email {email}. Invalid email or password.", request.Email);
+                logger.LogWarning("Login failed for {email}", request.Email);
+
                 return new AuthUserDto
                 {
                     Status = UserStatus.LoginFailed,
                     Message = $"Login failed for user with email {request.Email}. Invalid email or password."
                 };
             }
+
+            logger.LogInformation("User {userId} logged in", user.Id);
 
             return new AuthUserDto
             {
@@ -42,7 +45,8 @@ namespace OtusWebAuction.BL.Users
         {
             if (await userRepository.GetUserByEmail(request.Email, ct) is not null)
             {
-                logger.LogWarning("Registration failed: user with email {email} already exists.", request.Email);
+                logger.LogWarning("Registration failed: {email} already exists", request.Email);
+
                 return new AuthUserDto
                 {
                     Status = UserStatus.EmailAlreadyExists,
@@ -52,6 +56,8 @@ namespace OtusWebAuction.BL.Users
 
             string passwordHash = passwordHasher.Hash(request.Email, request.Password);
             UserDto user = await userRepository.CreateUser(request, passwordHash, ct);
+            logger.LogInformation("User {userId} registered", user.Id);
+
             return new AuthUserDto
             {
                 Status = UserStatus.Created,
@@ -64,13 +70,15 @@ namespace OtusWebAuction.BL.Users
             UserDto? user = await userRepository.UpdateUser(userId, request, ct);
             if (user is null)
             {
-                logger.LogWarning("Update failed: user with id {userId} not found.", userId);
+                logger.LogWarning("Update failed: user {userId} not found", userId);
                 return new AuthUserDto
                 {
                     Status = UserStatus.UserNotFound,
                     Message = $"User with id {userId} was not found."
                 };
             }
+
+            logger.LogInformation("User {userId} updated", userId);
 
             return new AuthUserDto
             {

@@ -16,6 +16,7 @@ using OtusWebAuction.DB.Repositories;
 using OtusWebAuction.Options;
 using OtusWebAuction.Security;
 using Serilog;
+using Serilog.Events;
 
 namespace OtusWebAuction
 {
@@ -25,17 +26,13 @@ namespace OtusWebAuction
         {
             WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
-            //TODO: писать логи не только в консоль
-            Log.Logger = new LoggerConfiguration()
-                .ReadFrom.Configuration(builder.Configuration)
-                .WriteTo.Console()
-                .CreateLogger();
+            builder.Host.UseSerilog((context, _, configuration) => configuration
+                .ReadFrom.Configuration(context.Configuration)
+                .Enrich.FromLogContext());
 
-            builder.Host.UseSerilog();
             // Add services to the container.
             builder.Host.ConfigureServices((context, services) =>
             {
-                services.AddSerilog();
                 services.AddControllers().AddJsonOptions(options =>
                     options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
                 services.AddOpenApi();
@@ -133,6 +130,29 @@ namespace OtusWebAuction
             {
                 app.MapOpenApi();
             }
+
+            app.UseSerilogRequestLogging(options =>
+            {
+                options.GetLevel = (httpContext, _, exception) =>
+                {
+                    if (httpContext.Request.Path.StartsWithSegments("/swagger")
+                        || httpContext.Request.Path.StartsWithSegments("/openapi"))
+                    {
+                        return LogEventLevel.Verbose;
+                    }
+
+                    return exception is not null || httpContext.Response.StatusCode >= 500
+                        ? LogEventLevel.Error
+                        : LogEventLevel.Information;
+                };
+                options.EnrichDiagnosticContext = (diagnosticContext, httpContext) =>
+                {
+                    if (httpContext.User.GetUserId() is { } userId)
+                    {
+                        diagnosticContext.Set("userId", userId);
+                    }
+                };
+            });
 
             app.UseHttpsRedirection();
 
