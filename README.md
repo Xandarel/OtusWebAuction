@@ -12,9 +12,11 @@
 - OtusWebAuction.DB - Слой работы с базой данных (PostgreSQL)
 - OtusWebAuction.Domain - Слой для общих сущностей
 
-## БД
-Для локальной разработки можно завести базу данных в docker командой
-docker run -d --name postgres-sql --restart unless-stopped -e POSTGRES_USER={userName} -e POSTGRES_PASSWORD='{pass}' -e POSTGRES_DB=sql -p 5432:5432 -v postgres_sql_data:/var/lib/postgresql postgres:18
+## Docker
+Для локальной разработки в паке docker собрар docker-compose.yml. В нем заведены 3 сервиса
+- PostgreSQL база данных
+- GrafanaLoki для хранения логов
+- Grafana для мониторинга логов
 
 userName и pass прописать в секрете OtusWebAuction в секции Postgres
 
