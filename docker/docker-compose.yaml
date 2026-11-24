@@ -1,39 +1,53 @@
+# Локальные значения можно переопределить в docker/.env (файл в .gitignore):
+# POSTGRES_USER, POSTGRES_PASSWORD, POSTGRES_DB
+# GF_SECURITY_ADMIN_USER, GF_SECURITY_ADMIN_PASSWORD
+
 services:
   postgres:
     image: postgres:18
     container_name: postgres-sql
     restart: unless-stopped
+    shm_size: 128mb
     environment:
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER:?Задайте POSTGRES_USER в docker/.env}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Задайте POSTGRES_PASSWORD в docker/.env}
+      POSTGRES_DB: ${POSTGRES_DB:-sql}
     ports:
       - "5432:5432"
     volumes:
+      # Тот же том, что у docker run -v postgres_sql_data:/var/lib/postgresql
       - postgres_sql_data:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -h 127.0.0.1"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
 
   loki:
     image: grafana/loki:3.4.2
     container_name: loki
     restart: unless-stopped
+    # Образ работает от uid 10001, а новый том принадлежит root.
+    user: "0:0"
     command: -config.file=/etc/loki/local-config.yaml
     ports:
       - "3100:3100"
     volumes:
-      - loki_data:/loki:rw
-    restart: unless-stopped
+      - ./loki/loki-config.yaml:/etc/loki/local-config.yaml:ro
+      - loki_data:/loki
 
   grafana:
     image: grafana/grafana:11.6.0
     container_name: grafana
     restart: unless-stopped
     environment:
-      GF_SECURITY_ADMIN_USER: ${GF_SECURITY_ADMIN_USER}
-      GF_SECURITY_ADMIN_PASSWORD: ${GF_SECURITY_ADMIN_PASSWORD}
+      GF_SECURITY_ADMIN_USER: ${GF_SECURITY_ADMIN_USER:-admin}
+      GF_SECURITY_ADMIN_PASSWORD: ${GF_SECURITY_ADMIN_PASSWORD:-admin}
     ports:
       - "3000:3000"
     volumes:
-      - ./grafana/provisioning:/etc/grafana/provisioning
+      - grafana_data:/var/lib/grafana
+      - ./grafana/provisioning/datasources:/etc/grafana/provisioning/datasources:ro
     depends_on:
       - loki
 
@@ -41,4 +55,5 @@ volumes:
   postgres_sql_data:
     external: true
     name: postgres_sql_data
-  loki_data: driver: local
+  loki_data:
+  grafana_data:
