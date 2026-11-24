@@ -11,7 +11,7 @@ namespace OtusWebAuction.Controllers
     [Route("[controller]")]
     public class CategoryController(ICategoryHandler categoryHandler, ILogger<CategoryController> logger) : ControllerBase
     {
-        [HttpGet]
+        [HttpGet("GetAllPerentCategory")]
         [Authorize]
         public async Task<ActionResult<IReadOnlyCollection<CategoryDto>>> GetAllPerentCategory(CancellationToken ct)
         {
@@ -39,7 +39,7 @@ namespace OtusWebAuction.Controllers
             };
         }
 
-        [HttpGet]
+        [HttpGet("GetAllSubcategory")]
         [Authorize]
         public async Task<ActionResult<IReadOnlyCollection<CategoryDto>>> GetAllSubcategory(int parentId) => throw new NotImplementedException();
 
