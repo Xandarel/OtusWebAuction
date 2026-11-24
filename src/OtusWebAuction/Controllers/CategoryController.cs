@@ -25,7 +25,7 @@ namespace OtusWebAuction.Controllers
             };
         }
 
-        [HttpGet("{id: int}")]
+        [HttpGet("{id:int}")]
         [Authorize]
         public async Task<ActionResult<CategoryDto>> Get([FromRoute] int id, CancellationToken ct)
         {
