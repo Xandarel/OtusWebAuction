@@ -1,22 +1,21 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using OtusWebAuction.BL.Catrgory;
 using OtusWebAuction.BL.Catrgory.Create;
 using OtusWebAuction.BL.Catrgory.Dto;
+using OtusWebAuction.BL.Interfaces.Categories;
 using OtusWebAuction.Domain.Enums;
 
 namespace OtusWebAuction.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    public class CategoryController(CategoryHandler categoryHandler) : ControllerBase
+    public class CategoryController(ICategoryHandler categoryHandler) : ControllerBase
     {
-        [HttpGet]
+        [HttpGet("GetAllPerentCategory")]
         [Authorize]
         public async Task<ActionResult<IReadOnlyCollection<CategoryDto>>> GetAllPerentCategory(CancellationToken ct)
         {
             CategoryHandlerDto<IReadOnlyCollection<CategoryDto>> responce = await categoryHandler.GetAllParentCategory(ct);
-
             return responce.Status switch
             {
                 HandlerStatus.Success => Ok(responce.Responce),
@@ -25,12 +24,11 @@ namespace OtusWebAuction.Controllers
             };
         }
 
-        [HttpGet("{id: int}")]
+        [HttpGet("{id:int}")]
         [Authorize]
         public async Task<ActionResult<CategoryDto>> Get([FromRoute] int id, CancellationToken ct)
         {
             CategoryHandlerDto<CategoryDto> responce = await categoryHandler.GetCategoryById(id, ct);
-
             return responce.Status switch
             {
                 HandlerStatus.Success => Ok(responce.Responce),
@@ -39,7 +37,7 @@ namespace OtusWebAuction.Controllers
             };
         }
 
-        [HttpGet]
+        [HttpGet("GetAllSubcategory")]
         [Authorize]
         public async Task<ActionResult<IReadOnlyCollection<CategoryDto>>> GetAllSubcategory(int parentId) => throw new NotImplementedException();
 
@@ -48,7 +46,6 @@ namespace OtusWebAuction.Controllers
         public async Task<ActionResult> CreateCategory(CategoryRequest request, CancellationToken ct)
         {
             await categoryHandler.CreateCategory(request, ct);
-
             return Ok();
         }
     }

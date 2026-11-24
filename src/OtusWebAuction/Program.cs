@@ -6,6 +6,7 @@ using Microsoft.OpenApi;
 using OtusWebAuction.BL.Catrgory;
 using OtusWebAuction.BL.Interfaces;
 using OtusWebAuction.BL.Interfaces.Categories;
+using OtusWebAuction.BL.Interfaces.Lot;
 using OtusWebAuction.BL.Interfaces.User;
 using OtusWebAuction.BL.Lots;
 using OtusWebAuction.BL.Users;
@@ -14,6 +15,8 @@ using OtusWebAuction.DB.Options;
 using OtusWebAuction.DB.Repositories;
 using OtusWebAuction.Options;
 using OtusWebAuction.Security;
+using Serilog;
+using Serilog.Events;
 
 namespace OtusWebAuction
 {
@@ -22,6 +25,10 @@ namespace OtusWebAuction
         public static void Main(string[] args)
         {
             WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
+
+            builder.Host.UseSerilog((context, _, configuration) => configuration
+                .ReadFrom.Configuration(context.Configuration)
+                .Enrich.FromLogContext());
 
             // Add services to the container.
             builder.Host.ConfigureServices((context, services) =>
@@ -86,15 +93,26 @@ namespace OtusWebAuction
                             // роль
                             RoleClaimType = "Role"
                         };
+
+                        options.Events = new JwtBearerEvents
+                        {
+                            OnAuthenticationFailed = context =>
+                            {
+                                var logger = context.HttpContext.RequestServices
+                                    .GetRequiredService<ILoggerFactory>()
+                                    .CreateLogger("JwtBearer");
+                                logger.LogWarning(context.Exception, "JWT отклонён для {Path}", context.Request.Path);
+                                return Task.CompletedTask;
+                            }
+                        };
                     });
 
                 services.AddTransient<IUserRepository, UserRepository>();
                 services.AddTransient<ICategoryRepository, CategoryRepository>();
                 services.AddTransient<IUserHandler, UserHandler>();
-                services.AddTransient<CategoryHandler>();
-                services.AddTransient<UserHandler>();
+                services.AddTransient<ICategoryHandler, CategoryHandler>();
                 services.AddTransient<ILotRepository, LotRepository>();
-                services.AddTransient<LotHandler>();
+                services.AddTransient<ILotHandler, LotHandler>();
                 services.AddTransient<IPasswordHasher, UserPasswordHasher>();
                 services.AddTransient<JwtTokenFactory>();
                 services.AddOptions<PostgresOptions>().BindConfiguration(PostgresOptions.SectionName);
@@ -112,6 +130,29 @@ namespace OtusWebAuction
             {
                 app.MapOpenApi();
             }
+
+            app.UseSerilogRequestLogging(options =>
+            {
+                options.GetLevel = (httpContext, _, exception) =>
+                {
+                    if (httpContext.Request.Path.StartsWithSegments("/swagger")
+                        || httpContext.Request.Path.StartsWithSegments("/openapi"))
+                    {
+                        return LogEventLevel.Verbose;
+                    }
+
+                    return exception is not null || httpContext.Response.StatusCode >= 500
+                        ? LogEventLevel.Error
+                        : LogEventLevel.Information;
+                };
+                options.EnrichDiagnosticContext = (diagnosticContext, httpContext) =>
+                {
+                    if (httpContext.User.GetUserId() is { } userId)
+                    {
+                        diagnosticContext.Set("userId", userId);
+                    }
+                };
+            });
 
             app.UseHttpsRedirection();
 

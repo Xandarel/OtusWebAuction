@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using OtusWebAuction.BL.Interfaces;
+using OtusWebAuction.BL.Interfaces.Lot;
 using OtusWebAuction.BL.Lots.Dto;
 using OtusWebAuction.BL.Lots.Request;
 using OtusWebAuction.DB.Context;
@@ -38,6 +38,7 @@ namespace OtusWebAuction.DB.Repositories
             lot.LastUpdatedDate = now;
             await dbContext.Lots.AddAsync(lot, ct);
             await dbContext.SaveChangesAsync(ct);
+
             return LotMapper.ToLotDto(lot);
         }
 
@@ -53,6 +54,7 @@ namespace OtusWebAuction.DB.Repositories
             LotMapper.Apply(request, lot);
             lot.LastUpdatedDate = DateTime.UtcNow;
             await dbContext.SaveChangesAsync(ct);
+
             return LotMapper.ToLotDto(lot);
         }
 
@@ -68,6 +70,7 @@ namespace OtusWebAuction.DB.Repositories
             lot.DeleteDate = DateTime.UtcNow;
             lot.LastUpdatedDate = DateTime.UtcNow;
             await dbContext.SaveChangesAsync(ct);
+
             return true;
         }
 
@@ -83,6 +86,7 @@ namespace OtusWebAuction.DB.Repositories
             lot.ModerationStatus = ModerationStatus.Moderating;
             lot.LastUpdatedDate = DateTime.UtcNow;
             await dbContext.SaveChangesAsync(ct);
+
             return LotMapper.ToLotDto(lot);
         }
 
@@ -98,6 +102,7 @@ namespace OtusWebAuction.DB.Repositories
             lot.ModerationStatus = ModerationStatus.Approved;
             lot.LastUpdatedDate = DateTime.UtcNow;
             await dbContext.SaveChangesAsync(ct);
+
             return LotMapper.ToLotDto(lot);
         }
 
@@ -113,6 +118,7 @@ namespace OtusWebAuction.DB.Repositories
             lot.ModerationStatus = ModerationStatus.Rejected;
             lot.LastUpdatedDate = DateTime.UtcNow;
             await dbContext.SaveChangesAsync(ct);
+
             return LotMapper.ToLotDto(lot);
         }
 

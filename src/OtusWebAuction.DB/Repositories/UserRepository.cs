@@ -20,6 +20,7 @@ namespace OtusWebAuction.DB.Repositories
             user.LastUpdatedDate = now;
             await dbContext.Users.AddAsync(user, ct);
             await dbContext.SaveChangesAsync(ct);
+
             return UserMapper.ToUserDto(user);
         }
         public async Task<UserDto?> UpdateUser(Guid userId, UpdateUserRequest request, CancellationToken ct)
@@ -33,6 +34,7 @@ namespace OtusWebAuction.DB.Repositories
             UserMapper.Apply(request, user);
             user.LastUpdatedDate = DateTime.UtcNow;
             await dbContext.SaveChangesAsync(ct);
+
             return UserMapper.ToUserDto(user);
         }
 

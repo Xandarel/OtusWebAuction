@@ -12,7 +12,9 @@ namespace OtusWebAuction.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    public class UserController(IUserHandler userHandler, JwtTokenFactory jwtTokenFactory) : ControllerBase
+    public class UserController(IUserHandler userHandler,
+        JwtTokenFactory jwtTokenFactory,
+        ILogger<UserController> logger) : ControllerBase
     {
         [AllowAnonymous]
         [HttpPost("RegisterUser")]
@@ -46,10 +48,13 @@ namespace OtusWebAuction.Controllers
         {
             if (User.GetUserId() is not { } userId)
             {
+                logger.LogWarning("UpdateUser отклонён: в токене нет корректного sub");
+
                 return Unauthorized();
             }
 
             AuthUserDto result = await userHandler.UpdateUser(userId, request, ct);
+
             return result.Status == UserStatus.Updated
                 ? Ok(result.Responce)
                 : ToError(result);

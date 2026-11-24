@@ -1,4 +1,5 @@
-﻿using OtusWebAuction.BL.Interfaces;
+﻿using Microsoft.Extensions.Logging;
+using OtusWebAuction.BL.Interfaces;
 using OtusWebAuction.BL.Interfaces.User;
 using OtusWebAuction.BL.Users.Dto;
 using OtusWebAuction.BL.Users.Login;
@@ -8,19 +9,23 @@ using OtusWebAuction.Domain.Enums;
 
 namespace OtusWebAuction.BL.Users
 {
-    public sealed class UserHandler(IUserRepository userRepository, IPasswordHasher passwordHasher) : IUserHandler
+    public sealed class UserHandler(IUserRepository userRepository, IPasswordHasher passwordHasher, ILogger<UserHandler> logger) : IUserHandler
     {
         public async Task<AuthUserDto> LoginUser(LoginUserRequest request, CancellationToken ct)
         {
             LoginUserDto? user = await userRepository.GetUserByEmail(request.Email, ct);
             if (user is null || !passwordHasher.Verify(request.Email, request.Password, user.Password))
             {
+                logger.LogWarning("Login failed for {email}", request.Email);
+
                 return new AuthUserDto
                 {
                     Status = UserStatus.LoginFailed,
-                    Message = "Invalid email or password."
+                    Message = $"Login failed for user with email {request.Email}. Invalid email or password."
                 };
             }
+
+            logger.LogInformation("User {userId} logged in", user.Id);
 
             return new AuthUserDto
             {
@@ -40,6 +45,8 @@ namespace OtusWebAuction.BL.Users
         {
             if (await userRepository.GetUserByEmail(request.Email, ct) is not null)
             {
+                logger.LogWarning("Registration failed: {email} already exists", request.Email);
+
                 return new AuthUserDto
                 {
                     Status = UserStatus.EmailAlreadyExists,
@@ -49,6 +56,8 @@ namespace OtusWebAuction.BL.Users
 
             string passwordHash = passwordHasher.Hash(request.Email, request.Password);
             UserDto user = await userRepository.CreateUser(request, passwordHash, ct);
+            logger.LogInformation("User {userId} registered", user.Id);
+
             return new AuthUserDto
             {
                 Status = UserStatus.Created,
@@ -61,12 +70,15 @@ namespace OtusWebAuction.BL.Users
             UserDto? user = await userRepository.UpdateUser(userId, request, ct);
             if (user is null)
             {
+                logger.LogWarning("Update failed: user {userId} not found", userId);
                 return new AuthUserDto
                 {
                     Status = UserStatus.UserNotFound,
                     Message = $"User with id {userId} was not found."
                 };
             }
+
+            logger.LogInformation("User {userId} updated", userId);
 
             return new AuthUserDto
             {

@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using OtusWebAuction.BL.Lots;
+using OtusWebAuction.BL.Interfaces.Lot;
 using OtusWebAuction.BL.Lots.Dto;
 using OtusWebAuction.BL.Lots.Request;
 using OtusWebAuction.Domain.Enums;
@@ -10,7 +10,7 @@ namespace OtusWebAuction.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    public class LotController(LotHandler lotHandler) : ControllerBase
+    public class LotController(ILotHandler lotHandler, ILogger<LotController> logger) : ControllerBase
     {
         [Authorize]
         [HttpPost("CreateLot")]
@@ -18,6 +18,7 @@ namespace OtusWebAuction.Controllers
         {
             if (User.GetUserId() is not { } sellerId)
             {
+                logger.LogWarning("CreateLot отклонён: в токене нет корректного sub");
                 return Unauthorized();
             }
 
@@ -35,6 +36,7 @@ namespace OtusWebAuction.Controllers
         {
             if (User.GetUserId() is not { } sellerId)
             {
+                logger.LogWarning("UpdateLot отклонён: в токене нет корректного sub");
                 return Unauthorized();
             }
 
@@ -52,6 +54,7 @@ namespace OtusWebAuction.Controllers
         {
             if (User.GetUserId() is not { } sellerId)
             {
+                logger.LogWarning("DeleteLot отклонён: в токене нет корректного sub");
                 return Unauthorized();
             }
 
@@ -69,6 +72,7 @@ namespace OtusWebAuction.Controllers
         {
             if (User.GetUserId() is not { } sellerId)
             {
+                logger.LogWarning("SendToModerate отклонён: в токене нет корректного sub");
                 return Unauthorized();
             }
 

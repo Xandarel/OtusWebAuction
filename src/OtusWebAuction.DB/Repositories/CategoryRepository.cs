@@ -9,51 +9,30 @@ namespace OtusWebAuction.DB.Repositories
 {
     public class CategoryRepository(AuctionDbContext dbContext) : ICategoryRepository
     {
-        public async Task CreateCategory(CategoryRequest request, CancellationToken ct)
+        public async Task<int> CreateCategory(CategoryRequest request, CancellationToken ct)
         {
             var category = CategoryMapper.ToCategory(request);
             await dbContext.Categories.AddAsync(category, ct);
             await dbContext.SaveChangesAsync(ct);
+            return category.Id;
         }
 
         public async Task<IReadOnlyCollection<CategoryDto>> GetAllParentCategory(CancellationToken ct)
         {
-            List<CategoryDto> responce = new();
-            try
-            {
-                responce = await dbContext.Categories
+            return await dbContext.Categories
                 .AsNoTracking()
                 .Where(x => x.IsActive && x.ParentId == null)
                 .Select(x => CategoryMapper.ToCategoryDto(x))
-                .ToListAsync();
-            }
-            catch
-            {
-                throw;
-            }
-
-            return responce;
+                .ToListAsync(ct);
         }
 
         public async Task<CategoryDto?> GetById(int id, CancellationToken ct)
         {
-            try
-            {
-                var item = await  dbContext.Categories
+            var item = await dbContext.Categories
                 .AsNoTracking()
-                .FirstOrDefaultAsync(x => x.Id == id && x.IsActive);
+                .FirstOrDefaultAsync(x => x.Id == id && x.IsActive, ct);
 
-                if (item is null)
-                {
-                    return null;
-                }
-
-                return CategoryMapper.ToCategoryDto(item);
-            }
-            catch
-            {
-                throw;
-            }
+            return item is null ? null : CategoryMapper.ToCategoryDto(item);
         }
     }
 }
