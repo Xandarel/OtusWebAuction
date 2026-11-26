@@ -35,6 +35,23 @@ namespace OtusWebAuction
             {
                 services.AddControllers().AddJsonOptions(options =>
                     options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
+
+                string[] allowedOrigins = context.Configuration
+                    .GetSection(CorsSettings.SectionName)
+                    .GetSection(nameof(CorsSettings.AllowedOrigins))
+                    .Get<string[]>()?
+                    .Where(origin => !string.IsNullOrWhiteSpace(origin))
+                    .ToArray() ?? [];
+
+                services.AddCors(options =>
+                {
+                    options.AddPolicy(CorsSettings.PolicyName, policy =>
+                    {
+                        policy.WithOrigins(allowedOrigins)
+                            .AllowAnyHeader()
+                            .AllowAnyMethod();
+                    });
+                });
                 services.AddOpenApi();
                 services.AddEndpointsApiExplorer();
                 services.AddSwaggerGen(options =>
@@ -155,6 +172,10 @@ namespace OtusWebAuction
             });
 
             app.UseHttpsRedirection();
+
+            // До аутентификации: preflight OPTIONS не несёт JWT, и его должен
+            // коротко замкнуть CORS, а не JwtBearer.
+            app.UseCors(CorsSettings.PolicyName);
 
             app.UseAuthentication();
             app.UseAuthorization();

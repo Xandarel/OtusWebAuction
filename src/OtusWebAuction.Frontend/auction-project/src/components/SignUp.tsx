@@ -14,6 +14,7 @@ interface SignUpState {
     password: string;
     error: string | null;
 }
+import { apiUrl } from '../api.ts';
 import { isEmail } from './validation.ts';
 
 
@@ -45,7 +46,7 @@ class SingUp extends Component<SignUpProps, SignUpState> {
         }
 
         try {
-            const response = await fetch('/User/RegisterUser', {
+            const response = await fetch(apiUrl('/User/RegisterUser'), {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
