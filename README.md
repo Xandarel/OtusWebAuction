@@ -20,6 +20,9 @@
 
 userName и pass прописать в секрете OtusWebAuction в секции Postgres
 
+## Frontend
+[компоненты](https://ui.shadcn.com/docs/components/base/input)
+
 ## Схема БД
 ![Схема базы](docs/Auction.svg)
 
