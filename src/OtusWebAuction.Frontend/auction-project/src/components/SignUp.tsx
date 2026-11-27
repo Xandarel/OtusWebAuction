@@ -2,7 +2,7 @@ import {type ChangeEvent, Component, type SubmitEvent} from 'react';
 import { Button } from "@/components/ui/button"
 import {
     Field,
-    FieldDescription,
+    FieldError,
     FieldGroup,
     FieldLabel,
 } from "@/components/ui/field"
@@ -159,9 +159,7 @@ class SingUp extends Component<SignUpProps, SignUpState> {
                             aria-invalid={this.state.emailError !== null}
                             aria-describedby={this.state.emailError !== null ? 'email-error' : undefined}
                         />
-                        <FieldDescription>
-                            {this.state.emailError !== null && <p id="email-error">{this.state.emailError}</p>}
-                        </FieldDescription>
+                        <FieldError id="email-error">{this.state.emailError}</FieldError>
                     </Field>
                     <Field>
                         <FieldLabel htmlFor="password">
@@ -177,9 +175,7 @@ class SingUp extends Component<SignUpProps, SignUpState> {
                             aria-describedby={this.state.passwordError !== null ? 'password-error' : undefined}
                             required
                         />
-                        <FieldDescription>
-                            {this.state.passwordError !== null && <p id="password-error">{this.state.passwordError}</p>}
-                        </FieldDescription>
+                        <FieldError id="password-error">{this.state.passwordError}</FieldError>
                     </Field>
 
                 </FieldGroup>
