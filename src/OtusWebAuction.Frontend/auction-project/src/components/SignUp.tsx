@@ -106,8 +106,8 @@ class SingUp extends Component<SignUpProps, SignUpState> {
                 return;
             }
             const data: { accessToken: string } = await response.json();
-            this.setState({ error: null });
-            console.log(data.accessToken);
+            localStorage.setItem('accessToken', data.accessToken);
+            this.setState({ error: null })
         } catch {
             this.setState({ error: 'Сервер недоступен' });
         }
